@@ -1,8 +1,12 @@
-{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) -}}
+{{- if eq .Values.env.open.STORAGE "local" }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ include "chartmuseum.fullname" . }}
+  labels:
+    app: {{ include "chartmuseum.fullname" . }}
+    release: {{ .Release.Name | quote }}
 spec:
   accessModes:
     - {{ .Values.persistence.accessMode | quote }}
@@ -14,6 +18,7 @@ spec:
   storageClassName: ""
 {{- else }}
   storageClassName: "{{ .Values.persistence.storageClass }}"
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
